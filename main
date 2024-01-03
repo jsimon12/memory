@@ -1,0 +1,51 @@
+import tkinter as tk
+from tkinter import messagebox
+import random
+
+class MemoryGame:
+    def __init__(self, master, rows=4, columns=4):
+        self.master = master
+        self.rows = rows
+        self.columns = columns
+        self.tiles = []
+        self.current_tiles = []
+        
+        # Erzeugung von Karten
+        self.create_board()
+        
+    def create_board(self):
+        symbols = [str(i) for i in range((self.rows * self.columns) // 2)] * 2
+        random.shuffle(symbols)
+        
+        for i in range(self.rows):
+            row = []
+            for j in range(self.columns):
+                tile = tk.Button(self.master, text=" ", width=5, height=2, command=lambda x=i, y=j: self.tile_clicked(x, y))
+                tile.grid(row=i, column=j)
+                row.append((tile, symbols[i * self.columns + j]))
+            self.tiles.append(row)
+    
+    def tile_clicked(self, x, y):
+        tile, symbol = self.tiles[x][y]
+        tile.config(text=symbol, state=tk.DISABLED)
+        self.current_tiles.append((tile, symbol))
+        
+        if len(self.current_tiles) == 2:
+            self.master.after(500, self.check_tiles)
+    
+    def check_tiles(self):
+        if self.current_tiles[0][1] == self.current_tiles[1][1]:
+            messagebox.showinfo("Match", "You found a match!")
+            self.current_tiles = []
+        else:
+            self.current_tiles[0][0].config(text=" ", state=tk.NORMAL)
+            self.current_tiles[1][0].config(text=" ", state=tk.NORMAL)
+            self.current_tiles = []
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    root.title("Memory Game")
+    
+    game = MemoryGame(root)
+    
+    root.mainloop()
